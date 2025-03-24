@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC 화상 채팅</title>
+    <!-- WebRTC 브라우저 호환성을 위한 어댑터 -->
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="./Select_Midia.js"></script>
+</head>
+<body>
+    <!-- 비디오 출력 영역 -->
+    <div style="display: flex; gap: 20px;">
+        <video id="localVideo" autoplay playsinline width="640" height="480"></video>
+        <video id="remoteVideo" autoplay playsinline width="640" height="480"></video>
+    </div>
+    
+    <!-- 미디어 장치 선택 -->
+    <div>
+        <label for="videoSelect">비디오 장치:</label>
+        <select id="videoSelect"></select>
+    </div>
+    <div>
+        <label for="audioSelect">오디오 장치:</label>
+        <select id="audioSelect"></select>
+    </div>
+
+    <!-- 컨트롤 버튼 -->
+    <button id="startBtn">통화 시작</button>
+    <button id="hangupBtn" disabled>통화 종료</button>
+
+    <!-- Socket.IO 클라이언트 라이브러리 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();  // Socket.IO 연결
+        let localStream;
+        let peerConnection;
+
+        // 미디어 장치 초기화
+        async function initMedia() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        
+        let constraints;
+        if (videoDevices.length > 0) {
+            constraints = {
+                audio: true,
+                video: true
+            };
+        } else {
+            constraints = {
+                audio: true
+            };
+        }
+        
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        document.getElementById('localVideo').srcObject = localStream;
+  } catch (err) {
+    switch(err.name) {
+      case 'NotFoundError':
+        console.error('카메라 또는 마이크를 찾을 수 없습니다.');
+        break;
+      case 'NotAllowedError':
+        console.error('사용자가 카메라/마이크 접근을 거부했습니다.');
+        break;
+      case 'OverconstrainedError':
+        console.error('지정된 제약조건을 만족하는 미디어를 찾을 수 없습니다.');
+        break;
+      case 'NotReadableError':
+        console.error('하드웨어 문제로 미디어에 접근할 수 없습니다.');
+        break;
+      default:
+        console.error('getUserMedia 오류:', err.name, err.message);
+    }
+  }
+}
+
+        // WebRTC 연결 설정
+        async function createPeerConnection() {
+            const configuration = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' }  // Google 공용 STUN 서버
+                ]
+            };
+
+            peerConnection = new RTCPeerConnection(configuration);
+
+            // ICE 후보 수집 이벤트
+            peerConnection.onicecandidate = ({ candidate }) => {
+                if (candidate) {
+                    socket.emit('ice-candidate', candidate);
+                }
+            };
+
+            // 원격 스트림 처리
+            peerConnection.ontrack = (event) => {
+                const remoteVideo = document.getElementById('remoteVideo');
+                if (!remoteVideo.srcObject) {
+                    remoteVideo.srcObject = event.streams[0];
+                }
+            };
+
+            // 로컬 스트림 추가
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+        }
+
+        // 통화 시작 핸들러
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            await createPeerConnection();
+            
+            // Offer 생성 및 전송
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit('offer', offer);
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('hangupBtn').disabled = false;
+        });
+
+        // 서버 이벤트 핸들링
+        socket.on('offer', async offer => {
+            await peerConnection.setRemoteDescription(offer);
+            
+            // Answer 생성 및 전송
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            socket.emit('answer', answer);
+        });
+
+        socket.on('answer', async answer => {
+            await peerConnection.setRemoteDescription(answer);
+        });
+
+        socket.on('ice-candidate', async candidate => {
+            try {
+                await peerConnection.addIceCandidate(candidate);
+            } catch (error) {
+                console.error('ICE 후보 추가 실패:', error);
+            }
+        });
+
+        // 초기화 실행
+        initMedia();
+    </script>
+</body>
+</html>
