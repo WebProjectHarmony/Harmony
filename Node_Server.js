@@ -4,12 +4,18 @@
 // 3. 종속성 설치 : npm install express socket.io
 
 const express = require('express');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const mysql = require('mysql2');
+const bcrypt = require('bcrypt');
 const socketIO = require('socket.io');
+
 const http = require('http');
 const path = require('path'); // 경로 처리를 위한 모듈
 
 const app = express();
 const server = http.createServer(app);
+
 const io = socketIO(server, {
     cors: {
         origin: '*',
@@ -17,12 +23,95 @@ const io = socketIO(server, {
     }
 });
 
-// 정적 파일 제공 설정 (public 폴더 사용)
-app.use(express.static(path.join(__dirname)));
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'dhdy3846??',
+    database: 'login_db'
+  });
+
+// 데이터베이스 연결 확인
+db.connect((err) => {
+    if (err) {
+        console.error('MySQL 연결 오류:', err);
+        process.exit(1); // 서버 종료
+    }
+    console.log('MySQL 연결 성공');
+});
+
+
+// 미들웨어 설정
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({
+  secret: 'itsRandomString',
+  resave: false,
+  saveUninitialized: true
+}));
+
+// 로그인 페이지 렌더링
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+  });
+  
+// 로그인 처리
+  app.post('/login', (req, res) => {
+    const { userNAME, userPWD } = req.body;
+    
+    db.query('SELECT * FROM users WHERE userNAME = ?', [userNAME], async (error, results) => {
+      if (error) {
+        res.status(500).json({ success: false, message: '서버 오류' });
+        return;
+      }
+      
+      if (results.length > 0) {
+        const comparison = await bcrypt.compare(userPWD, results[0].userPWD); 
+        if (comparison) {
+          req.session.loggedin = true;
+          req.session.username = userNAME;
+          res.json({ success: true });
+        } else {
+          res.json({ success: false, message: '잘못된 비밀번호' });
+        }
+      } else {
+        res.json({ success: false, message: '존재하지 않는 사용자' });
+      }
+    });
+  });
+
+  // 회원가입 페이지 렌더링
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'register.html'));
+  });
+  
+  // 회원가입 처리
+  app.post('/register', async (req, res) => {
+    const { userNAME, userPWD, email } = req.body;
+    
+    try {
+      const hashedPassword = await bcrypt.hash(userPWD, 10);
+      
+      db.query('INSERT INTO users (userNAME, userPWD, email) VALUES (?, ?, ?)',
+        [userNAME, hashedPassword, email],
+        (error) => {
+          if (error) {
+            res.status(500).json({ success: false, message: '서버 오류' });
+          } else {
+            res.json({ success: true });
+          }
+        }
+      );
+    } catch (error) {
+      res.status(500).json({ success: false, message: '서버 오류' });
+    }
+  });
+
+
+// 정적 파일 제공 설정
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 기본 경로 라우팅 설정
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'Test.html'));
+    res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 // WebRTC 시그널링 처리
@@ -51,7 +140,21 @@ app.use((req, res) => {
     res.status(404).send('<h1>Page not found</h1>');
 });
 
+
+// 더미 데이터 생성 및 삽입 함수
+async function createDummyUser(username, password, email) {
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await query('INSERT INTO users (userNAME, userPWD, email) VALUES (?, ?, ?)',
+                    [username, hashedPassword, email]);
+        console.log(`더미 사용자 ${username} 생성 완료`);
+    } catch (error) {
+        console.error('더미 사용자 생성 중 오류:', error);
+    }
+}
+
 // 서버 실행
 server.listen(3000, () => {
     console.log('서버 실행 중: http://localhost:3000');
+
 });
