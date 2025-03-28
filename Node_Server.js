@@ -141,18 +141,6 @@ app.use((req, res) => {
 });
 
 
-// 더미 데이터 생성 및 삽입 함수
-async function createDummyUser(username, password, email) {
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await query('INSERT INTO users (userNAME, userPWD, email) VALUES (?, ?, ?)',
-                    [username, hashedPassword, email]);
-        console.log(`더미 사용자 ${username} 생성 완료`);
-    } catch (error) {
-        console.error('더미 사용자 생성 중 오류:', error);
-    }
-}
-
 // 서버 실행
 server.listen(3000, () => {
     console.log('서버 실행 중: http://localhost:3000');
