@@ -4,10 +4,11 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const userNAME = this.userNAME.value.trim();
     const userPWD = this.userPWD.value.trim();
+    const userNickname = this.userNickname.value.trim();
     const email = this.email.value.trim();
     
-    if (!userNAME || !userPWD || !email) {
-        alert('사용자 이름, 비밀번호, 이메일을 모두 입력해주세요.');
+    if (!userNAME || !userPWD || !email || !userNickname) {
+        alert('사용자 이름, 비밀번호, 별명, 이메일을 모두 입력해주세요.');
         return;
     }
 
@@ -16,7 +17,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userNAME, userPWD, email })
+        body: JSON.stringify({ userNAME, userPWD, userNickname, email })
     })
     .then(response => {
         if (!response.ok) {

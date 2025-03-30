@@ -141,25 +141,34 @@ app.post('/login', async (req, res) => {
   
   // 회원가입 처리
   app.post('/register', async (req, res) => {
-    const { userNAME, userPWD, email } = req.body;
-    
     try {
+      const { userNAME, userPWD, userNickname, email } = req.body;
+  
+      if (!userNAME || !userPWD || !email || !userNickname) {
+        return res.status(400).json({ success: false, message: '모든 필드를 입력해주세요.' });
+      }
+  
+      // 비밀번호 암호화
       const hashedPassword = await bcrypt.hash(userPWD, 10);
-      
-      db.query('INSERT INTO users (userNAME, userPWD, email) VALUES (?, ?, ?)',
-        [userNAME, hashedPassword, email],
+  
+      // 데이터베이스에 사용자 추가
+      db.query(
+        'INSERT INTO users (userNAME, userPWD, userNickname, email) VALUES (?, ?, ?, ?)',
+        [userNAME, hashedPassword, userNickname, email],
         (error) => {
           if (error) {
-            res.status(500).json({ success: false, message: '서버 오류' });
-          } else {
-            res.json({ success: true });
+            console.error('Database query error:', error);
+            return res.status(500).json({ success: false, message: '회원가입 실패' });
           }
+          return res.json({ success: true });
         }
       );
     } catch (error) {
-      res.status(500).json({ success: false, message: '서버 오류' });
+      console.error('Server error:', error);
+      return res.status(500).json({ success: false, message: '서버 내부 오류' });
     }
   });
+  
 
 
 // 정적 파일 제공 설정
