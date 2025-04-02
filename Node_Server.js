@@ -11,16 +11,17 @@ const bcrypt = require('bcrypt');
 const socketIO = require('socket.io');
 const http = require('http');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'dhdy3846??',
-    database: 'login_db'
+    host: process.env.db_host,
+    user: process.env.db_user,
+    password: process.env.db_password,
+    database: process.env.db_database
 });
 
 db.connect((err) => {
