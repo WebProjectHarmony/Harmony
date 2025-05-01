@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "agora-access-token": "^2.0.4",
+    "agora-rtc-sdk-ng": "^4.23.3",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
     "dotenv": "^16.4.7",
