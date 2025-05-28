@@ -1,4 +1,22 @@
 {
+  "name": "harmony",
+  "version": "1.0.0",
+  "description": "express 설치\r npm install express socket.io",
+  "main": "harmony.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebProjectHarmony/Harmony.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WebProjectHarmony/Harmony/issues"
+  },
+  "homepage": "https://github.com/WebProjectHarmony/Harmony#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
@@ -6,16 +24,7 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "mysql2": "^3.14.0",
+    "react-router-dom": "^7.6.1",
     "socket.io": "^4.8.1"
-  },
-  "name": "harmony",
-  "version": "1.0.0",
-  "main": "harmony.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }

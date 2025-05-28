@@ -18,10 +18,14 @@ const server = http.createServer(app);
 const io = socketIO(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
 
 const db = mysql.createConnection({
-    host: process.env.db_host,
-    user: process.env.db_user,
-    password: process.env.db_password,
-    database: process.env.db_database
+    host: 'localhost',
+    user: 'root',
+    password: 'ehddus123',
+    database: 'asdf'
+    // host: process.env.db_host,
+    // user: process.env.db_user,
+    // password: process.env.db_password,
+    // database: process.env.db_database
 });
 
 db.connect((err) => {
@@ -80,6 +84,9 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/mainPage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mainPage.html')); 
+});
 
 app.get('/Test.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'Test.html')); 
@@ -209,6 +216,6 @@ app.use((req, res) => {
 
 // 서버 실행
 server.listen(3000, () => {
-    console.log('서버 실행 중: http://localhost:3000');
+    console.log('서버 실행 중: localhost:3000');
 
 });
