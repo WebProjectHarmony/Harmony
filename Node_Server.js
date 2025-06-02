@@ -1,21 +1,28 @@
-// 실행 전 확인사항
-// 1. HTTPS 설정: localhost 테스트 시 생략 가능
-// 2. 방화벽 설정: 3000 포트 개방
-// 3. 종속성 설치 : npm install express socket.io
-
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
-const socketIO = require('socket.io');
 const http = require('http');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
+
+const { RtcTokenBuilder, RtcRole } = require('agora-access-token'); // Agora 토큰 생성 라이브러리
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// === Agora 설정 ===
+const appId = process.env.Agora_appId;
+const appCertificate = process.env.Agora_appCertificate;
+// === Agora 설정 끝 ===
+
+app.get('/env', (req, res) => {
+  res.json({ appId });
+});
 
 const db = mysql.createConnection({
     host: process.env.db_host,
@@ -95,6 +102,7 @@ app.use(express.static(path.join(__dirname)));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
+    //res.sendFile(path.join(__dirname, 'Test.html'));
 });
 
   
@@ -170,36 +178,45 @@ app.post('/login', async (req, res) => {
     }
   });
   
-
-
 // 정적 파일 제공 설정
 app.use(express.static(path.join(__dirname)));
 
-// // 기본 경로 라우팅 설정
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'register.html'));
-// });
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// WebRTC 시그널링 처리
-io.on('connection', (socket) => {
-    console.log('A user connected');
 
-    socket.on('offer', (offer) => {
-        socket.broadcast.emit('offer', offer);
-    });
+// === Agora RTC 토큰 생성 API 엔드포인트 추가 ===
+// 클라이언트(브라우저)가 이 경로로 요청하여 RTC 토큰을 받음
+app.get('/rtcToken', (req, res) => {
+    // 클라이언트로부터 채널 이름과 UID를 쿼리 파라미터로 받음
+    const channelName = req.query.channelName;
+    // UID는 클라이언트에서 지정하거나 서버에서 생성 가능
+    // 여기서는 클라이언트에서 넘겨받거나 (없으면 ''로 처리), 서버에서 Agora에 자동 할당을 맡긴다....
+    const uid = req.query.uid || 0; // 0 또는 null을 넘기면 Agora가 자동 할당
 
-    socket.on('answer', (answer) => {
-        socket.broadcast.emit('answer', answer);
-    });
+    if (!channelName) {
+        // 채널 이름이 없으면 오류 응답
+        return res.status(400).json({ error: 'channelName is required' });
+    }
 
-    socket.on('ice-candidate', (candidate) => {
-        socket.broadcast.emit('ice-candidate', candidate);
-    });
+    // 토큰 만료 시간 설정 (초 단위)
+    // 예: 3600초 = 1시간 후 만료
+    const expirationTimeInSeconds = 3600;
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-    });
+    // RTC 토큰 생성
+    // buildTokenWithUid: UID 기반 토큰 생성
+    // buildTokenWithAccount: 사용자 계정 이름 기반 토큰 생성
+    const token = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, RtcRole.PUBLISHER, privilegeExpiredTs);
+
+    // 생성된 토큰을 클라이언트에게 JSON 형태로 응답
+    res.json({ rtcToken: token });
 });
+// === Agora RTC 토큰 생성 API 엔드포인트 끝 ===
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 // 404 에러 처리 (라우팅되지 않은 요청)
 app.use((req, res) => {
