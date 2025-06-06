@@ -11,13 +11,14 @@ const bcrypt = require('bcrypt');
 const socketIO = require('socket.io');
 const http = require('http');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
 
-const db = mysql.createConnection({
+const db = mysql.createConnection({   // db sql 호스트 정보
     host: 'localhost',
     user: 'root',
     password: 'ehddus123',
@@ -37,6 +38,8 @@ db.connect((err) => {
 });
 
 // 미들웨어 설정
+app.use(cors()); // html 과 db 연결
+
 app.use(express.json()); // JSON 요청 본문 파싱
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
@@ -219,3 +222,15 @@ server.listen(3000, () => {
     console.log('서버 실행 중: localhost:3000');
 
 });
+
+
+// 방에 속한 유저 조회
+app.get('/api/rooms/:id/users', (req, res) => {
+  const roomId = req.params.id;
+  db.query('SELECT name FROM users WHERE room_id = ?', [roomId], (err, result) => {
+    if (err) return res.status(500).send(err);
+    res.json(result);
+  });
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
