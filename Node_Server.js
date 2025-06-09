@@ -184,6 +184,56 @@ app.use(express.static(path.join(__dirname)));
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+  // 채팅방 생성
+  app.post('/createroom', async (req, res) => {
+    try {
+      const { roomname, roomtype, createdby } = req.body;
+  
+      if (!roomname ) {
+        return res.status(400).json({ success: false, message: 'roomname을 입력해주세요.' });
+      }
+  
+  
+      // 데이터베이스에 사용자 추가
+      db.query(
+        'INSERT INTO chatrooms (roomname, roomtype, createdby) VALUES (?, ?, ?)',
+        [roomname, roomtype, createdby],
+        (error) => {
+          if (error) {
+            console.error('Database query error:', error);
+            return res.status(500).json({ success: false, message: '방 생성 실패' });
+          }
+          return res.json({ success: true });
+        }
+      );
+    } catch (error) {
+      console.error('Server error:', error);
+      return res.status(500).json({ success: false, message: '서버 내부 오류' });
+    }
+  });
+
+  ///////
+
+  app.get('/fetchroom', async (req, res) => {
+  try {
+    db.query('SELECT * FROM chatrooms ORDER BY roomID DESC', (error, results) => {
+      if (error) {
+        console.error('Database query error:', error);
+        return res.status(500).json({ success: false, message: '채팅방 목록 불러오기 실패' });
+      }
+      return res.json({ success: true, rooms: results });
+    });
+  } catch (error) {
+    console.error('Server error:', error);
+    return res.status(500).json({ success: false, message: '서버 내부 오류' });
+  }
+});
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 // === Agora RTC 토큰 생성 API 엔드포인트 추가 ===
 // 클라이언트(브라우저)가 이 경로로 요청하여 RTC 토큰을 받음
 app.get('/rtcToken', (req, res) => {
