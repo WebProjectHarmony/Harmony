@@ -7,8 +7,12 @@ const http = require('http');
 const path = require('path');
 require('dotenv').config();
 
+
 const app = express();
 const server = http.createServer(app);
+
+const cors = require('cors');
+app.use(cors());
 
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token'); // Agora 토큰 생성 라이브러리
 
@@ -185,38 +189,37 @@ app.use(express.static(path.join(__dirname)));
 
 
   // 채팅방 생성
-  app.post('/createroom', async (req, res) => {
-    try {
-      const { roomname, roomtype, createdby } = req.body;
-  
-      if (!roomname ) {
-        return res.status(400).json({ success: false, message: 'roomname을 입력해주세요.' });
-      }
-  
-  
-      // 데이터베이스에 사용자 추가
-      db.query(
-        'INSERT INTO chatrooms (roomname, roomtype, createdby) VALUES (?, ?, ?)',
-        [roomname, roomtype, createdby],
-        (error) => {
-          if (error) {
-            console.error('Database query error:', error);
-            return res.status(500).json({ success: false, message: '방 생성 실패' });
-          }
-          return res.json({ success: true });
-        }
-      );
-    } catch (error) {
-      console.error('Server error:', error);
-      return res.status(500).json({ success: false, message: '서버 내부 오류' });
+app.post('/createroom', async (req, res) => {
+  try {
+    const { roomname, roomtype, createdby } = req.body;
+
+    if (!roomname) {
+      return res.status(400).json({ success: false, message: 'roomname을 입력해주세요.' });
     }
-  });
+
+    db.query(
+      'INSERT INTO chatrooms (roomname, roomtype, createdby) VALUES (?, ?, ?)',
+      [roomname, roomtype, createdby],
+      (error, results) => {  // 수정: results 파라미터 추가
+        if (error) {
+          console.error('Database query error:', error);
+          return res.status(500).json({ success: false, message: '방 생성 실패' });
+        }
+        // 생성된 방 ID(insertId)를 반환합니다
+        return res.json({ success: true, roomID: results.insertId });
+      }
+    );
+  } catch (error) {
+    console.error('Server error:', error);
+    return res.status(500).json({ success: false, message: '서버 내부 오류' });
+  }
+});
 
   ///////
 
-  app.get('/fetchroom', async (req, res) => {
+app.get('/fetchroom', async (req, res) => {
   try {
-    db.query('SELECT * FROM chatrooms ORDER BY roomID DESC', (error, results) => {
+    db.query('SELECT * FROM chatrooms ORDER BY roomID ASC', (error, results) => {
       if (error) {
         console.error('Database query error:', error);
         return res.status(500).json({ success: false, message: '채팅방 목록 불러오기 실패' });

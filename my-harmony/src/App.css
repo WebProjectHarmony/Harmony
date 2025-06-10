@@ -1,153 +1,199 @@
-#root {
-  max-width: 1280px;
-
-  text-align: center;
-}
-
+/* 전체 페이지 컨테이너 (app) */
 .app {
   display: flex;
-  height: 99vh;
-  width: 99vw;
+  height: 98vh;
+  width: 98vw;
+  border: 2px solid #8a72cc; /* 연보라 외곽선 */
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-family: "Malgun Gothic", Arial, sans-serif;
+  background-color: #f8f8f8;
 }
 
+/* 사이드바 */
 .sidebar {
-  width: 260px;
-  background-color: #ffffff;
-  border: 4px solid #a88cc8;
-  border-radius: 15px;
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  text-align: left;
-}
-
-.search {
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  background-color: #eae6f3;
-  margin-bottom: 20px;
-  width: 245px;
-}
-
-.navItem {
-  display: block;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  background-color: #eae6f3;
-  text-decoration: none;
-  color: black;
-}
-
-.profileSection {
-  background-color: #c5bed9;
-  border-radius: 10px;
-  padding: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.formWrapper {
+  justify-content: flex-start;
+  width: 260px;
+  background-color: #fff;
   border: 4px solid #a88cc8;
   border-radius: 15px;
-  margin-left: 7px;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow-y: auto;
+
+  /* 전체 화면에서 위아래 공간 여유를 주는 방법 예시 */
+  margin:20px 20px;
+
+  /* 또는 높이 조정으로 여백 주기 */
+  /* max-height: calc(98vh - 20px); /* 전체 뷰포트 높이에서 마진 포함해서 조정 */
 }
 
-.formBox {
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 40px;
-  width: 500px;
-}
 
-.formGroup {
-  margin-bottom: 25px;
-  display: flex;
-  align-items: center;
-}
 
-.label {
-  width: 120px;
-  font-size: 18px;
-}
-
-.input {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #aaa;
-}
-
-.button {
-  background-color: #8650a8;
-  color: white;
+/* 검색 입력 */
+.search {
+  width: 100%;
+  padding: 8px 14px;
   border: none;
-  padding: 10px 24px;
+  border-radius: 12px;
+  background-color: #e7e5f5;
+  font-size: 14px;
+  color: #5c5b75;
+  margin-bottom: 16px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* 방 목록 박스 */
+.roomListBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;  /* 방 목록 사이 간격 */
+  width: 100%;
+}
+
+/* 방 링크 (메인페이지 / 통화방 링크) */
+.roomLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  color: #4a467c;
+  background-color: #f1efff;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  width: 89%; /* 링크가 사이드바 너비에 꽉 차도록 */
+}
+
+.roomLink .icon {
   font-size: 16px;
+}
+
+.roomLink:hover {
+  background-color: #d4cfff;
+  color: #2e2971;
+}
+
+/* 활성화된 방 링크 */
+.roomLink.active {
+  background-color: #5f49b3 !important;
+  color: white !important;
+  font-weight: 700;
+}
+
+/* 프로필 섹션 */
+.profileSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #d1c7f1;
   border-radius: 10px;
-  float: right;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2f2c40;
   cursor: pointer;
 }
 
+.profileSection .profileCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #cccce1;
+  margin-right: 12px;
+}
+
+.profileSection .settingsIcon {
+  font-size: 18px;
+  color: #4e47a4;
+}
+
+/* 컨텐츠 영역 오른쪽 박스 */
 .content {
-  flex: 1;
-  padding: 40px;
-}
-/* 통화방 */
-.MemberBox {
-  border: 4px solid #a88cc8;
+  flex-grow: 1;
+  margin: 20px 20px 20px 10px;
+  background-color: #f9f9fa;
   border-radius: 10px;
-  position: relative;
-  width: 80%;
-  height: 150px; /* 상단 공간 크기 */
+  border: 4px solid #a88cc8; /* sidebar와 동일한 두께 및 색상 적용 */
+  padding: 48px 60px;
+  box-sizing: border-box;
   display: flex;
-  justify-content: top center; /* 수평 중앙 */
-  align-items: start;
-  margin-bottom: 650px;
+  justify-content: center;
+  align-items: center;
 }
 
-/*  애니메이션   */
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* 방 생성 폼 */
+.roomForm {
+  width: 450px;
+  background-color: #fafafa;
+  border: 1px solid #8a72cc;
+  border-radius: 8px;
+  padding: 28px 36px;
+  box-sizing: border-box;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* 방 생성 제목 */
+.roomForm h2 {
+  margin-bottom: 24px;
+  font-weight: 600;
+  font-size: 22px;
+  color: #4f4b6f;
+  text-align: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* 입력 & 셀렉트 박스 래퍼 */
+.formRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 22px;
 }
 
-.card {
-  padding: 2em;
+/* 라벨 */
+.formRow label {
+  width: 100px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #3d375a;
 }
 
-.read-the-docs {
-  color: #888;
+/* 텍스트 입력, 셀렉트 박스 */
+.formRow input[type="text"],
+.formRow select {
+  flex-grow: 1;
+  padding: 8px 12px;
+  font-size: 15px;
+  border: 1.5px solid #9d94c7;
+  border-radius: 8px;
+  outline: none;
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+.formRow input[type="text"]:focus,
+.formRow select:focus {
+  border-color: #6e5ab9;
+}
+
+/* 방 생성 버튼 */
+.createButton {
+  float: right;
+  background-color: #6e5ab9;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.createButton:hover {
+  background-color: #5a4496;
 }
