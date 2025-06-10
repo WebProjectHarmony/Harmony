@@ -25,7 +25,8 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     .then(data => {
       if (data.success) {
         alert('로그인 성공!');
-        window.location.href = '/Test.html';
+        //window.location.href = '/Test.html';
+        window.location.href = 'http://localhost:5173';
       } else {
         alert('로그인 실패: ' + data.message);
       }
