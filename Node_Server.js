@@ -192,7 +192,6 @@ app.use(express.static(path.join(__dirname)));
 app.post('/createroom', async (req, res) => {
   try {
     const { roomname, roomtype, createdby } = req.body;
-
     if (!roomname) {
       return res.status(400).json({ success: false, message: 'roomname을 입력해주세요.' });
     }
@@ -200,12 +199,12 @@ app.post('/createroom', async (req, res) => {
     db.query(
       'INSERT INTO chatrooms (roomname, roomtype, createdby) VALUES (?, ?, ?)',
       [roomname, roomtype, createdby],
-      (error, results) => {  // 수정: results 파라미터 추가
+      (error, results) => {
         if (error) {
           console.error('Database query error:', error);
           return res.status(500).json({ success: false, message: '방 생성 실패' });
         }
-        // 생성된 방 ID(insertId)를 반환합니다
+        // 생성된 방 ID 반환
         return res.json({ success: true, roomID: results.insertId });
       }
     );
@@ -242,6 +241,7 @@ app.get('/fetchroom', async (req, res) => {
 app.get('/rtcToken', (req, res) => {
     // 클라이언트로부터 채널 이름과 UID를 쿼리 파라미터로 받음
     const channelName = req.query.channelName;
+    console.log(req.query.channelName);
     // UID는 클라이언트에서 지정하거나 서버에서 생성 가능
     // 여기서는 클라이언트에서 넘겨받거나 (없으면 ''로 처리), 서버에서 Agora에 자동 할당을 맡긴다....
     const uid = req.query.uid || 0; // 0 또는 null을 넘기면 Agora가 자동 할당

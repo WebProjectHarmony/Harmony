@@ -349,7 +349,6 @@ startScreenShareBtn.onclick = async () => {
              console.log("시스템 오디오 미사용, localAudioTrack은 createScreenVideoTrack 호출 전 상태 유지.");
              // 기존 오디오 트랙이 발행 중지되지 않았다면 계속 발행된 상태여야 합니다.
         }
-        // === 수정된 부분 끝 ===
 
 
         console.log("최종 localScreenVideoTrack:", localScreenVideoTrack);
