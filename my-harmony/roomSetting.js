@@ -8,7 +8,8 @@ const RoomSetting = () => {
 
   // 방 목록 불러오기
   useEffect(() => {
-    axios.get('http://localhost:3000/fetchroom') // API 주소 수정 필요
+    //axios.get('http://localhost:3000/fetchroom') // API 주소 수정 필요
+    axios.get('https://25d8-203-243-7-226.ngrok-free.app/fetchroom') // API 주소 수정 필요
       .then((res) => {
         setRooms(res.data);
       })
@@ -30,7 +31,8 @@ const RoomSetting = () => {
     };
 
     // 서버에 방 생성 요청
-    axios.post('http://localhost:3000/createroom', newRoom) // POST API 주소 및 구조 수정 필요
+    //axios.post('http://localhost:3000/Test.html', newRoom) 
+    axios.post('https://25d8-203-243-7-226.ngrok-free.app/Test.html', newRoom) 
       .then((res) => {
         // 성공 시 목록에 새 방 추가
         setRooms([...rooms, res.data]);

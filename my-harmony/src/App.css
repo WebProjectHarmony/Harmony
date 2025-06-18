@@ -24,13 +24,8 @@
   overflow-y: auto;
 
   /* 전체 화면에서 위아래 공간 여유를 주는 방법 예시 */
-  margin:20px 20px;
-
-  /* 또는 높이 조정으로 여백 주기 */
-  /* max-height: calc(98vh - 20px); /* 전체 뷰포트 높이에서 마진 포함해서 조정 */
+  margin: 20px 20px;
 }
-
-
 
 /* 검색 입력 */
 .search {
@@ -50,7 +45,7 @@
 .roomListBox {
   display: flex;
   flex-direction: column;
-  gap: 8px;  /* 방 목록 사이 간격 */
+  gap: 8px; /* 방 목록 사이 간격 */
   width: 100%;
 }
 
@@ -68,18 +63,24 @@
   background-color: #f1efff;
   transition: background-color 0.25s ease, color 0.25s ease;
   width: 89%; /* 링크가 사이드바 너비에 꽉 차도록 */
+
+  /* 추가된 부분 */
+  cursor: pointer; /* 클릭 가능 표시 */
+  user-select: none; /* 텍스트 선택 방지 */
 }
 
+/* 아이콘 스타일 */
 .roomLink .icon {
   font-size: 16px;
 }
 
+/* 마우스 오버시 배경 및 글자색 변화 */
 .roomLink:hover {
   background-color: #d4cfff;
   color: #2e2971;
 }
 
-/* 활성화된 방 링크 */
+/* 활성화된 방 링크 스타일 */
 .roomLink.active {
   background-color: #5f49b3 !important;
   color: white !important;

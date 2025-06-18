@@ -26,7 +26,8 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
       if (data.success) {
         alert('로그인 성공!');
         //window.location.href = '/Test.html';
-        window.location.href = 'http://localhost:5173';
+         window.location.href = 'http://localhost:5173';
+        // window.location.href = 'https://a89e-203-243-7-226.ngrok-free.app';
       } else {
         alert('로그인 실패: ' + data.message);
       }

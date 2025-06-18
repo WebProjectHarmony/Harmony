@@ -24,7 +24,8 @@ export async function connectToChannel(channelName, uid = null) {
 
     try {
         // 토큰 요청
-        const res = await fetch(`http://localhost:3000/rtcToken?channelName=${encodeURIComponent(channelName)}&uid=${uid ?? ''}`);
+         const res = await fetch(`http://localhost:3000/rtcToken?channelName=${encodeURIComponent(channelName)}&uid=${uid ?? ''}`);
+        //const res = await fetch(`http://localhost:3000/rtcToken?channelName=${encodeURIComponent(channelName)}&uid=${uid ?? ''}`);
         const data = await res.json();
         if (data.error || !data.rtcToken) {
             console.error('토큰을 받지 못했거나 오류:', data.error || '토큰 없음');
