@@ -29,14 +29,14 @@ input {
 button {
     width: 100%;
     padding: 10px;
-    background-color: #007bff;
+    background-color: #a494dc;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 button:hover {
-    background-color: #0056b3;
+    background-color: #a494dc;
 }
 
 /*  ///////////////////////////////////////////////  */
@@ -77,7 +77,7 @@ button:hover {
   }
   
   .radio-inputs .radio input:checked + .name {
-    background-color: #fff;
+    background-color: #a494dc;
     font-weight: 600;
   }
 

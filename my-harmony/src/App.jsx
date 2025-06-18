@@ -56,7 +56,9 @@ const Sidebar = ({ rooms, selectedRoomName }) => {
       <div className="profileSection">
         <div className="profileCircle"></div>
         <span>Profile</span>
-        <button className="settingsIcon" aria-label="Settings">
+        <button className="settingsIcon" aria-label="Settings"
+        onClick={() => navigate("/settings")}
+          style={{ cursor: "pointer" }}>
           ⚙️
         </button>
       </div>
@@ -65,17 +67,13 @@ const Sidebar = ({ rooms, selectedRoomName }) => {
 };
 
 const CallRoom = ({ roomName }) => {
-  const [participants] = useState([
-    "Samantha",
-    "jackson",
-    "jennie",
-    "winter",
-  ]);
+  const [participants] = useState(["Samantha", "jackson", "jennie", "winter"]);
   const [sharing, setSharing] = useState(false);
 
   return (
     <div className="callPage">
-      <div className="participants-list">
+      {/* 참가자 박스 */}
+      <div className="userbox">
         {participants.map((user, i) => (
           <div key={i} className="participant">
             <div className="participant-avatar" />
@@ -84,21 +82,15 @@ const CallRoom = ({ roomName }) => {
         ))}
       </div>
 
+      {/* 영상영역 */}
       <div id="local-video" className="screen-share" />
 
+      {/* 버튼들 */}
       <div className="call-controls">
-        <button
-          className="btn connect"
-          onClick={() => connectToChannel(roomName)}
-          aria-label="채널 연결"
-        >
+        <button className="btn connect" onClick={() => connectToChannel(roomName)} aria-label="채널 연결">
           📞
         </button>
-        <button
-          className="btn disconnect"
-          onClick={() => leaveChannel()}
-          aria-label="채널 연결 해제"
-        >
+        <button className="btn disconnect" onClick={leaveChannel} aria-label="채널 연결 해제">
           ✖️
         </button>
         <button
@@ -119,6 +111,7 @@ const CallRoom = ({ roomName }) => {
     </div>
   );
 };
+
 
 const RoomPage = ({ refreshRoomList, allRooms, loadingRooms }) => {
   const [roomName, setRoomName] = useState("");
@@ -264,7 +257,7 @@ const Room = ({ rooms }) => {
 
   return (
     <div className="content">
-      <h2>{`통화방: ${currentRoom.roomname}`}</h2>
+      {/* <h2>{`통화방: ${currentRoom.roomname}`}</h2> */}
       <CallRoom roomName={currentRoom.roomname} />
       {loadingUsers ? (
         <p>참가자 목록 로딩 중...</p>
@@ -273,8 +266,8 @@ const Room = ({ rooms }) => {
           className="user-boxes"
           style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}
         >
-          {users.length === 0 ? (
-            <p>아직 참가자가 없습니다.</p>
+           {users.length === 0 ? (
+            <p></p>
           ) : (
             users.map((user, idx) => (
               <div
@@ -287,7 +280,7 @@ const Room = ({ rooms }) => {
                   backgroundColor: "#f3eaff",
                   fontWeight: "600",
                 }}
-              >
+              > 
                 {user.name || `사용자 ${idx + 1}`}
               </div>
             ))
@@ -297,6 +290,64 @@ const Room = ({ rooms }) => {
     </div>
   );
 };
+
+const Setting = () => {
+  return (
+    <div className="settingContainer">
+      <h1 className="settingTitle">설정</h1>
+      <section className="settingSection">
+        {/* 프로필 */}
+        <div className="settingRow">
+          <div className="settingProfileInfo">
+            <div style={{ fontWeight: 700, marginRight: 12 }}>프로필</div>
+            <div className="settingProfileCircle"></div>
+            <div className="settingNickname">닉네임</div>
+          </div>
+          <button className="settingModifyBtn" type="button">수정</button>
+        </div>
+
+        {/* 이메일 */}
+        <div className="settingRow" style={{ borderBottom: 'none', paddingBottom: 0, marginTop: 20 }}>
+          <div style={{ fontWeight: 700 }}>이메일</div>
+          <button className="settingModifyBtn" type="button">수정</button>
+        </div>
+        <div style={{ padding: '8px 0 12px 0', fontSize: 16, fontWeight: 400 }}>
+          test@test.com
+        </div>
+
+        {/* 미디어 장치 */}
+        <div className="settingSectionTitle">미디어 장치</div>
+        <div className="settingMediaDeviceRow">
+          <label htmlFor="input-device" className="settingMediaDeviceLabel">입력 장치</label>
+          <select id="input-device" name="input-device" className="settingSelect">
+            <option value="">선택하세요</option>
+            <option value="mic1">마이크 1</option>
+            <option value="mic2">마이크 2</option>
+          </select>
+        </div>
+        <div className="settingMediaDeviceRow">
+          <label htmlFor="output-device" className="settingMediaDeviceLabel">출력 장치</label>
+          <select id="output-device" name="output-device" className="settingSelect">
+            <option value="">선택하세요</option>
+            <option value="speaker1">스피커 1</option>
+            <option value="speaker2">스피커 2</option>
+          </select>
+        </div>
+        <div className="settingMediaDeviceRow">
+          <label htmlFor="camera-device" className="settingMediaDeviceLabel">카메라 장치</label>
+          <select id="camera-device" name="camera-device" className="settingSelect">
+            <option value="">선택하세요</option>
+            <option value="camera1">카메라 1</option>
+            <option value="camera2">카메라 2</option>
+          </select>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+    
+ 
 
 const Dummy = ({ text }) => (
   <div className="content">
@@ -352,9 +403,11 @@ const MainApp = () => {
               />
             }
           />
+          
+
           <Route path="/server/:roomId" element={<Room rooms={allRooms} />} />
           <Route path="/profile" element={<Dummy text="프로필 페이지" />} />
-          <Route path="/settings" element={<Dummy text="설정 페이지" />} />
+          <Route path="/settings" element={<Setting />} />
         </Routes>
       </Router>
     </div>
